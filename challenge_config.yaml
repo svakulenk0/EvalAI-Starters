@@ -46,9 +46,9 @@ challenge_phases:
     end_date: 2099-01-01 00:00:00 # Far in the future so that the leaderboard can stay open
     test_annotation_file: annotations/test_annotations_original.json
     codename: original
-    max_submissions_per_day: 100
-    max_submissions_per_month: 100
-    max_submissions: 100
+    max_submissions_per_day: 10000
+    max_submissions_per_month: 10000
+    max_submissions: 10000
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
