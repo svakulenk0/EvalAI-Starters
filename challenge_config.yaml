@@ -7,36 +7,48 @@ evaluation_details: templates/evaluation_details.html
 terms_and_conditions: templates/terms_and_conditions.html
 image: logo.jpg
 submission_guidelines: templates/submission_guidelines.html
-leaderboard_description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras egestas a libero nec sagittis.
+leaderboard_description: Leaderboard of the SCAI’21 Conversational Question Answering Challenge
 evaluation_script: evaluation_script.zip
 remote_evaluation: False
 is_docker_based: False
-start_date: 2019-01-01 00:00:00
-end_date: 2099-05-31 23:59:59
+start_date: 2021-04-01 00:00:00
+end_date: 2099-01-01 00:00:00 # Far in the future so that the leaderboard can stay open
 published: False
 
 leaderboard:
   - id: 1
     schema:
       {
-        "labels": ["Metric1", "Metric2", "Metric3", "Total"],
-        "default_order_by": "Total",
+        "labels": ["ROUGE-1 R", "USE", "R@10"],
+        "default_order_by": "R@10",
+      }
+  - id: 2
+    schema:
+      {
+        "labels": ["MRR", "R@10", "R@100"],
+        "default_order_by": "R@100",
+      }
+  - id: 3
+    schema:
+      {
+        "labels": ["F1", "EM"],
+        "default_order_by": "F1",
       }
 
 challenge_phases:
   - id: 1
-    name: Dev Phase
-    description: templates/challenge_phase_1_description.html
+    name: Original Test Set Phase
+    description: templates/phase_original_test_set_description.html
     leaderboard_public: False
     is_public: True
-    is_submission_public: True
-    start_date: 2019-01-19 00:00:00
-    end_date: 2099-04-25 23:59:59
-    test_annotation_file: annotations/test_annotations_devsplit.json
-    codename: dev
-    max_submissions_per_day: 5
-    max_submissions_per_month: 50
-    max_submissions: 50
+    is_submission_public: False
+    start_date: 2021-04-01 00:00:00
+    end_date: 2099-01-01 00:00:00 # Far in the future so that the leaderboard can stay open
+    test_annotation_file: annotations/test_annotations_original.json
+    codename: original
+    max_submissions_per_day: 100
+    max_submissions_per_month: 100
+    max_submissions: 100
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
@@ -46,73 +58,40 @@ challenge_phases:
         is_visible: True
       - name: publication_url
         is_visible: True
-    submission_meta_attributes:
-      - name: TextAttribute
-        description: Sample
-        type: text
-        required: False
-      - name: SingleOptionAttribute
-        description: Sample
-        type: radio
-        options: ["A", "B", "C"]
-      - name: MultipleChoiceAttribute
-        description: Sample
-        type: checkbox
-        options: ["alpha", "beta", "gamma"]
-      - name: TrueFalseField
-        description: Sample
-        type: boolean
-        required: True
-    is_restricted_to_select_one_submission: False
-    is_partial_submission_evaluation_enabled: False
-    allowed_submission_file_types: ".json, .zip, .txt, .tsv, .gz, .csv, .h5, .npy, .npz"
-  - id: 2
-    name: Test Phase
-    description: templates/challenge_phase_2_description.html
-    leaderboard_public: True
-    is_public: True
-    is_submission_public: True
-    start_date: 2019-01-01 00:00:00
-    end_date: 2099-05-24 23:59:59
-    test_annotation_file: annotations/test_annotations_testsplit.json
-    codename: test
-    max_submissions_per_day: 5
-    max_submissions_per_month: 50
-    max_submissions: 50
-    default_submission_meta_attributes:
-      - name: method_name
-        is_visible: True
-      - name: method_description
-        is_visible: True
-      - name: project_url
-        is_visible: True
-      - name: publication_url
-        is_visible: True
-    submission_meta_attributes:
-      - name: TextAttribute
-        description: Sample
-        type: text
-      - name: SingleOptionAttribute
-        description: Sample
-        type: radio
-        options: ["A", "B", "C"]
-      - name: MultipleChoiceAttribute
-        description: Sample
-        type: checkbox
-        options: ["alpha", "beta", "gamma"]
-      - name: TrueFalseField
-        description: Sample
-        type: boolean
-    is_restricted_to_select_one_submission: False
-    is_partial_submission_evaluation_enabled: False
+# I don't think we need these?
+#    submission_meta_attributes:
+#      - name: TextAttribute
+#        description: Sample
+#        type: text
+#        required: False
+#      - name: SingleOptionAttribute
+#        description: Sample
+#        type: radio
+#        options: ["A", "B", "C"]
+#      - name: MultipleChoiceAttribute
+#        description: Sample
+#        type: checkbox
+#        options: ["alpha", "beta", "gamma"]
+#      - name: TrueFalseField
+#        description: Sample
+#        type: boolean
+#        required: True
+#
+# No idea what these are
+#    is_restricted_to_select_one_submission: False
+#    is_partial_submission_evaluation_enabled: False
+#    allowed_submission_file_types: ".json, .zip, .txt, .tsv, .gz, .csv, .h5, .npy, .npz"
 
 dataset_splits:
   - id: 1
-    name: Train Split
-    codename: train_split
+    name: Question Rewriting (Original Test Set)
+    codename: original_test_set_question_rewriting
   - id: 2
-    name: Test Split
-    codename: test_split
+    name: Passage Retrieval (Original Test Set)
+    codename: original_test_set_passage_retrieval
+  - id: 3
+    name: Question Answering (Original Test Set)
+    codename: original_test_set_question_answering
 
 challenge_phase_splits:
   - challenge_phase_id: 1
@@ -121,15 +100,15 @@ challenge_phase_splits:
     visibility: 1
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
-  - challenge_phase_id: 2
-    leaderboard_id: 1
-    dataset_split_id: 1
-    visibility: 3
+  - challenge_phase_id: 1
+    leaderboard_id: 2
+    dataset_split_id: 2
+    visibility: 1
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
-  - challenge_phase_id: 2
-    leaderboard_id: 1
-    dataset_split_id: 2
+  - challenge_phase_id: 1
+    leaderboard_id: 3
+    dataset_split_id: 3
     visibility: 1
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
