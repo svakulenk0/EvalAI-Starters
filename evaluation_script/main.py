@@ -1,5 +1,7 @@
 import random
 
+from evaluate_qa import compute_f1
+
 
 def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwargs):
     print("Starting Evaluation.....")
@@ -39,6 +41,10 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
             'submitted_at': u'2017-03-20T19:22:03.880652Z'
         }
     """
+
+    # def compute_f1(a_gold: str, a_pred: str) -> float:
+
+    
     output = {}
     if phase_codename == "dev":
         print("Evaluating for Dev Phase")
