@@ -18,26 +18,41 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         You can access the submission metadata
         with kwargs['submission_metadata']
     """
-    # acknowledgement: https://github.com/doc2dial/sharedtask-dialdoc2021/blob/master/scripts/sharedtask_utils.py
-    metric = load_metric("squad_v2")
-
     dataset = json.load(open(test_annotation_file, "r"))
-    references = []
+    qa_references, qr_references = [], []
     for qa in dataset:
-        references.append(
+        qa_references.append(
             {
                 "id": "%d_%d" % (qa["Conversation_no"], qa["Turn_no"]),
-                "answers": qa["Answer"],
+                "answer": qa["Answer"]
+            }
+        )
+        qr_references.append(
+            {
+                "id": "%d_%d" % (qa["Conversation_no"], qa["Turn_no"]),
+                "rewrite": qa["Rewrite"]
             }
         )
 
-    predictions = json.load(open(user_submission_file, "r"))
+    # TODO how to differentiate between submissions?
 
-    assert (len(predictions) == len(references))
 
-    metric.add_batch(predictions=predictions, references=references)
-    final_score = metric.compute()
+    # calculate QA metrics
+    qa_predictions = json.load(open(user_submission_file, "r"))
+    assert (len(qa_predictions) == len(qa_references))
+    qa_metric = load_metric("squad_v2")
+    qa_metric.add_batch(predictions=qa_predictions, references=qa_references)
+    qa_score = qa_metric.compute()
     # OrderedDict([('exact', 33.333333333333336), ('f1', 38.095238095238095), ('span', 33.333333333333336), ('total', 3), ('HasAns_exact', 33.333333333333336), ('HasAns_f1', 38.095238095238095), ('HasAns_total', 3)])
+
+
+    # calculate QR metrics
+    qr_predictions = json.load(open(user_submission_file, "r"))
+    assert (len(qr_predictions) == len(qr_references))
+    qr_metric = load_metric("rouge")
+    qr_metric.add_batch(predictions=qr_predictions, references=qr_references)
+    qr_score = qr_metric.compute()
+    # rouge1 rougeL
 
     output = {}
     if phase_codename == "original":
@@ -45,8 +60,9 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         output["result"] = [
             {
                 "test_split": {
-                    "EM": final_score['exact']
-                    "F1": final_score['f1']
+                    "EM": qa_score['exact'],
+                    "F1": qa_score['f1'],
+                    "ROUGE-1 R": qr_score['rouge1'].mid.recall
                 }
             },
         ]
