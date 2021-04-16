@@ -16,11 +16,11 @@ end_date: 2099-01-01 00:00:00 # Far in the future so that the leaderboard can st
 published: False
 
 leaderboard:
-  - id: 1
+   - id: 3
     schema:
       {
-        "labels": ["ROUGE-1 R", "USE", "R@10"],
-        "default_order_by": "R@10",
+        "labels": ["F1", "EM"],
+        "default_order_by": "F1",
       }
   - id: 2
     schema:
@@ -28,11 +28,11 @@ leaderboard:
         "labels": ["MRR", "R@10", "R@100"],
         "default_order_by": "R@100",
       }
-  - id: 3
+  - id: 1
     schema:
       {
-        "labels": ["F1", "EM"],
-        "default_order_by": "F1",
+        "labels": ["ROUGE-1 R"],
+        "default_order_by": "ROUGE-1 R",
       }
 
 challenge_phases:
