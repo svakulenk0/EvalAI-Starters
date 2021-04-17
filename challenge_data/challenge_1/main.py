@@ -20,30 +20,43 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
     """
     dataset = json.load(open(test_annotation_file, "r"))
     qa_references, qr_references = [], []
+    qa_ids, qr_ids = [], []
     for qa in dataset:
-        qa_references.append(
-            {
-                "id": "%d_%d" % (qa["Conversation_no"], qa["Turn_no"]),
-                "answers": {'answer_start': [0], 'text': [qa["Answer"]]}
-            }
-        )
-        qr_references.append(qa["Rewrite"])
+        _id = "%d_%d" % (qa["Conversation_no"], qa["Turn_no"])
+        # skip empty answers and rewrites
+        if qa["Answer"]:
+            qa_ids.append(_id)
+            qa_references.append(
+                {
+                    "id": _id,
+                    "answers": {'answer_start': [0], 'text': [qa["Answer"]]}
+                }
+            )
+        if qa["Rewrite"]:
+            qr_ids.append(_id)
+            qr_references.append(qa["Rewrite"])
 
     # TODO how to differentiate between submissions?
-
-    qa_predictions = json.load(open(user_submission_file, "r"))
+    print(user_submission_file)
+    submission = json.load(open(user_submission_file, "r"))
+    
     qa_predictions, qr_predictions = [], []
-    for qa in dataset:
-        if "Answer" in qa:
+    for qa in submission:
+        _id = "%d_%d" % (qa["Conversation_no"], qa["Turn_no"])
+        if "Model-Answer" in qa and _id in qa_ids:
+            if not qa["Model-Answer"]:
+                qa["Model-Answer"] = ""
             qa_predictions.append(
                 {
-                    "id": "%d_%d" % (qa["Conversation_no"], qa["Turn_no"]),
-                    "prediction_text": qa["Answer"],
+                    "id": _id,
+                    "prediction_text": qa["Model-Answer"],
                     'no_answer_probability': 0.
                 }
             )
-        if "Rewrite" in qa:
-            qr_predictions.append(qa["Rewrite"])
+        if "Model-Rewrite" in qa and _id in qr_ids:
+            if not qa["Model-Rewrite"]:
+                qa["Model-Rewrite"] = ""
+            qr_predictions.append(qa["Model-Rewrite"])
 
     if qa_predictions:
         # calculate QA metrics
@@ -79,9 +92,10 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         if qa_predictions:
             output["result"][0]["original_test_set_question_answering"] = qa_results
         if qr_predictions:
-            output["result"][0]["original_test_set_question_answering"] = qr_results
+            output["result"][0]["original_test_set_question_rewriting"] = qr_results
                
         # To display the results in the result file
         output["submission_result"] = output["result"][0]
+        print(output["submission_result"])
         print("Completed evaluation for Original Phase")
     return output

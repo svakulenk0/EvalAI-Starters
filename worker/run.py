@@ -18,7 +18,7 @@ def run():
     annotation_file_path = "{}/annotations/qrecc_test.json".format(
         current_working_directory
     )  # Add the test annotation file path
-    user_submission_file_path = "{}/submission.json".format(
+    user_submission_file_path = "{}/results/naacl21_results_nonconversational.json".format(
         current_working_directory
     )  # Add the sample submission file path
 
