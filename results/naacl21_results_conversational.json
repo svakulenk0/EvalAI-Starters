@@ -13101,7 +13101,7 @@
         "Conversation_no": 290,
         "Turn_no": 1,
         "Model-Rewrite": "What happened in 1981?",
-        "Model-Answer": "1981."
+        "Model-Answer": "1981"
     },
     {
         "Conversation_no": 290,
@@ -16389,7 +16389,7 @@
         "Conversation_no": 371,
         "Turn_no": 1,
         "Model-Rewrite": "What happened in 1981?",
-        "Model-Answer": "1981."
+        "Model-Answer": "1981"
     },
     {
         "Conversation_no": 371,
@@ -71506,6 +71506,12 @@
         "Turn_no": 1,
         "Model-Rewrite": "When was Colors released?",
         "Model-Answer": "2019"
+    },
+    {
+        "Conversation_no": 1716,
+        "Turn_no": 2,
+        "Model-Rewrite": "Was Colorssuccessful?",
+        "Model-Answer": "the Buried and"
     },
     {
         "Conversation_no": 1716,

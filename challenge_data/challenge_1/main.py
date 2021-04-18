@@ -44,6 +44,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
     for qa in submission:
         _id = "%d_%d" % (qa["Conversation_no"], qa["Turn_no"])
         if "Model-Answer" in qa and _id in qa_ids:
+            qa_ids.remove(_id)
             if not qa["Model-Answer"]:
                 qa["Model-Answer"] = ""
             qa_predictions.append(
@@ -59,11 +60,22 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
             qr_predictions.append(qa["Model-Rewrite"])
 
     if qa_predictions:
+        # fill in empty for missing questions
+        for _id in qa_ids:
+            print(_id)
+            qa_predictions.append(
+                {
+                    "id": _id,
+                    "prediction_text": "",
+                    'no_answer_probability': 0.
+                }
+            )    
         # calculate QA metrics
+        print(len(qa_predictions), len(qa_references))
         assert (len(qa_predictions) == len(qa_references))
         qa_metric = load_metric("squad_v2")
-        print(qa_predictions[0])
-        print(qa_references[0])
+        # print(qa_predictions[0])
+        # print(qa_references[0])
 
         qa_metric.add_batch(predictions=qa_predictions, references=qa_references)
 
