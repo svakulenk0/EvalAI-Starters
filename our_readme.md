@@ -2,6 +2,7 @@
 
 * datasets
 * rouge_score
+* pytrec_eval
 
 ## Test
 
