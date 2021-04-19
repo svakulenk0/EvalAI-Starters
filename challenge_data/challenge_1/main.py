@@ -1,6 +1,7 @@
 import random
 import json
 from datasets import load_metric
+import pytrec_eval
 
 
 def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwargs):
@@ -19,7 +20,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         with kwargs['submission_metadata']
     """
     dataset = json.load(open(test_annotation_file, "r"))
-    qa_references, qr_references = [], []
+    qa_references, pr_references, qr_references = [], {}, []
     qa_ids, qr_ids = [], []
     for qa in dataset:
         _id = "%d_%d" % (qa["Conversation_no"], qa["Turn_no"])
@@ -32,6 +33,10 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
                     "answers": {'answer_start': [0], 'text': [qa["Answer"]]}
                 }
             )
+        if qa["Passages"]:
+            pr_references[_id] = {passage:1 for passage in qa["Passages"]}
+        else:
+            pr_references[_id] = {"":1}
         if qa["Rewrite"]:
             qr_ids.append(_id)
             qr_references.append(qa["Rewrite"])
@@ -40,7 +45,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
     print(user_submission_file)
     submission = json.load(open(user_submission_file, "r"))
     
-    qa_predictions, qr_predictions = [], []
+    qa_predictions, pr_predictions, qr_predictions = [], {}, []
     for qa in submission:
         _id = "%d_%d" % (qa["Conversation_no"], qa["Turn_no"])
         if "Model-Answer" in qa and _id in qa_ids:
@@ -54,6 +59,8 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
                     'no_answer_probability': 0.
                 }
             )
+        if "Model-Passages" in qa and _id in pr_references:
+            pr_predictions[_id] = qa["Model-Passages"]
         if "Model-Rewrite" in qa and _id in qr_ids:
             if not qa["Model-Rewrite"]:
                 qa["Model-Rewrite"] = ""
@@ -86,6 +93,17 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
                         "F1": qa_score['f1'],
                      }
 
+    if pr_predictions:
+        # calculate PR metrics:
+        print(len(pr_predictions), len(pr_references))
+        assert (len(pr_predictions) == len(pr_references))
+        pr_metric = pytrec_eval.RelevanceEvaluator(pr_references, {'recip_rank'})
+        pr_results_single = pr_metric.evaluate(pr_predictions)
+        mrrs = [scores["recip_rank"] for scores in pr_results_single.values()]
+        pr_results = {
+                         "MRR": sum(mrrs)/len(mrrs)
+                     }
+
     if qr_predictions:
         # calculate QR metrics
         assert (len(qr_predictions) == len(qr_references))
@@ -103,6 +121,8 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         output["result"] = [{}]
         if qa_predictions:
             output["result"][0]["original_test_set_question_answering"] = qa_results
+        if pr_predictions:
+            output["result"][0]["original_test_set_passage_retrieval"] = pr_results
         if qr_predictions:
             output["result"][0]["original_test_set_question_rewriting"] = qr_results
                

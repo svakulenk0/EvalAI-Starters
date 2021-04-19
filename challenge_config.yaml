@@ -25,8 +25,8 @@ leaderboard:
   - id: 2
     schema:
       {
-        "labels": ["MRR", "R@10", "R@100"],
-        "default_order_by": "R@100",
+        "labels": ["MRR"],
+        "default_order_by": "MRR",
       }
   - id: 1
     schema:
